@@ -1,0 +1,49 @@
+﻿@page "/"
+
+@inject Services.PythonProcess _python
+
+<div>
+    <div>
+        <label for="File Path">File Path</label>
+        <input class="form-control" type="text" placeholder="File Path" @bind-value="_path" />
+        <br />
+    </div>
+
+    <div>
+        <label for="File Path">Old Bytes</label>
+        <input class="form-control" type="text" placeholder="Old Bytes" @bind-value="_oldBytes" />
+        <br />
+    </div>
+
+    <div>
+        <label for="File Path">New Bytes</label>
+        <input class="form-control" type="text" placeholder="New Bytes" @bind-value="_newBytes" />
+        <br />
+    </div>
+</div>
+
+<div>
+    <p>
+        <button class="btn btn-primary" @onclick="OnClickReplace">
+            Replace
+        </button>
+    </p>
+</div>
+
+@code {
+    string _path;
+    string _oldBytes = "ABC";
+    string _newBytes = "CBA";
+
+    void OnClickReplace()
+    {
+        _python.FileReplace(_path, _oldBytes, _newBytes);
+
+        (_newBytes, _oldBytes) = (_oldBytes, _newBytes);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _path = _python.projectPath + @"\TestFile";
+    }
+}
