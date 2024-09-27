@@ -1,0 +1,70 @@
+﻿@page "/UnrealEngine"
+@using Microsoft.Maui.Storage
+
+@inject Services.PythonProcess Python
+
+<h2 align="Center">Unreal Engine</h2>
+
+<div class="container p-3">
+    <div class="row">
+        <div class="col-auto">
+            <button class="btn btn-primary" @onclick="SelectFile">
+                Select Project
+            </button>
+        </div>
+        <div class="col">
+            <input class="form-control" type="text" placeholder="Project Path" @bind-value="_selectedFilePath" />
+        </div>
+    </div>
+</div>
+
+<div class="container p-3">
+    <div class="row">
+        <div class="col-auto">
+            <button class="btn btn-primary" @onclick="RenameProject">
+                Rename Project
+            </button>
+        </div>
+        <div class="col">
+            <input class="form-control" type="text" placeholder="Target Name" @bind-value="_targetMame" />
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private string _selectedFilePath = "";
+    private string _targetMame = "";
+
+    private async Task SelectFile()
+    {
+        try
+        {
+            var result = await FilePicker.Default.PickAsync(new PickOptions
+                {
+                    PickerTitle = ".uproject 파일을 선택하세요",
+                    FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+                {
+                    { DevicePlatform.WinUI, new[] { ".uproject" } },
+                    { DevicePlatform.MacCatalyst, new[] { ".uproject" } },
+                    { DevicePlatform.Android, new[] { "application/octet-stream" } }, // Android용 MIME 타입
+                    { DevicePlatform.iOS, new[] { "public.data" } } // iOS용 UTI
+                })
+                });
+
+            if (result != null)
+            {
+                _selectedFilePath = result.FullPath;
+            }
+        }
+        catch (Exception ex)
+        {
+            // 예외 처리 (필요에 따라 로그 또는 사용자에게 메시지 표시)
+        }
+    }
+
+    private async Task RenameProject()
+    {
+        await Python.RenameProjectNameAsync(_selectedFilePath, _targetMame);
+    }
+}

@@ -1,0 +1,9 @@
+﻿@page "/"
+@inject NavigationManager NavigationManagerReference
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManagerReference.NavigateTo("/UnrealEngine");
+    }
+}

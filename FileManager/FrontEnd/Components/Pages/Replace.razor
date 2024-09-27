@@ -1,6 +1,6 @@
-﻿@page "/"
+﻿@page "/Replace"
 
-@inject Services.PythonProcess _python
+@inject Services.PythonProcess Python
 
 <div>
     <div>
@@ -24,26 +24,36 @@
 
 <div>
     <p>
-        <button class="btn btn-primary" @onclick="OnClickReplace">
+        <button class="btn btn-primary" @onclick="OnClickReplace" disabled="@_disableButton">
             Replace
         </button>
     </p>
 </div>
 
 @code {
-    string _path;
+    string _path = "";
     string _oldBytes = "ABC";
     string _newBytes = "CBA";
+    bool _disableButton = false;
 
     void OnClickReplace()
     {
-        _python.FileReplace(_path, _oldBytes, _newBytes);
+        _disableButton = true;
+        Python.FileReplaceAsync(_path, _oldBytes, _newBytes).ContinueWith(OnFileReplaceFinish);
+    }
 
-        (_newBytes, _oldBytes) = (_oldBytes, _newBytes);
+    void OnFileReplaceFinish(Task task)
+    {
+        InvokeAsync(() =>
+        {
+            _disableButton = false;
+            (_newBytes, _oldBytes) = (_oldBytes, _newBytes);
+            StateHasChanged();
+        });
     }
 
     protected override async Task OnInitializedAsync()
     {
-        _path = _python.projectPath + @"\TestFile";
+        _path = Python.ProjectPath + @"\TestFile";
     }
 }

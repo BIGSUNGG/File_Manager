@@ -1,4 +1,7 @@
-Python/
+!Python/
+Python/*
+!Python/HERE.txt
+
 .vs
 bin
 obj

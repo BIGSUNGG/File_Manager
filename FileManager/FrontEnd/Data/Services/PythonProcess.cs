@@ -12,44 +12,55 @@ using static System.Net.Mime.MediaTypeNames;
 namespace Services
 {
     public class PythonProcess
-    {
-        public readonly string solutionPath;
-        public readonly string projectPath;
+    {         
+        // Project
+        public readonly string SolutionPath;
+        public readonly string ProjectPath;
 
         // IronPython
-        private readonly ScriptEngine pyEngine;
+        private readonly ScriptEngine _pyEngine;
+                 
+        private readonly ScriptSource _utilityScource;
+        private readonly ScriptScope _utilityScope;
+                 
+        private readonly ScriptSource _fileScource;
+        private readonly ScriptScope _fileScope;
 
-        private readonly ScriptSource utilityScource;
-        private readonly ScriptScope utilityScope;
+        private readonly ScriptSource _unrealScource;
+        private readonly ScriptScope _unrealScope;
 
-        private readonly ScriptSource replaceScource;
-        private readonly ScriptScope replaceScope;
+        object _lock = new object();
 
         public PythonProcess()
         {
             string filePath = AppDomain.CurrentDomain.BaseDirectory;
-            solutionPath    = Path.GetFullPath(Path.Combine(filePath, @"..\..\..\..\..\.."));
-            projectPath     = Path.GetFullPath(Path.Combine(filePath, @"..\..\..\..\..\..\.."));
+            SolutionPath    = Path.GetFullPath(Path.Combine(filePath, @"..\..\..\..\..\.."));
+            ProjectPath     = Path.GetFullPath(Path.Combine(filePath, @"..\..\..\..\..\..\.."));
 
             // IronPython
-            pyEngine = Python.CreateEngine();
-            utilityScope = pyEngine.CreateScope();
-            replaceScope = pyEngine.CreateScope();
+            _pyEngine = Python.CreateEngine();
+            _utilityScope = _pyEngine.CreateScope();
+            _fileScope = _pyEngine.CreateScope();
+            _unrealScope = _pyEngine.CreateScope();
 
             // 파이썬 모듈 참고 경로 추가
-            var paths = pyEngine.GetSearchPaths();
-            paths.Add(projectPath + @"\Python");
-            paths.Add(projectPath + @"\Python\DLLs");
-            paths.Add(projectPath + @"\Python\Lib");
-            paths.Add(projectPath + @"\Python\Lib\site-packages");
-            pyEngine.SetSearchPaths(paths);
+            var paths = _pyEngine.GetSearchPaths();
+            paths.Add(ProjectPath + @"\Python");
+            paths.Add(ProjectPath + @"\Python\DLLs");
+            paths.Add(ProjectPath + @"\Python\Lib");
+            paths.Add(ProjectPath + @"\Python\Lib\site-packages");
+            paths.Add(SolutionPath + @"\BackEnd");
+            _pyEngine.SetSearchPaths(paths);
 
             // Source 불러오기
-            utilityScource = pyEngine.CreateScriptSourceFromFile(solutionPath + @"\BackEnd\Utility.py");
-            utilityScource.Execute(utilityScope);
+            _utilityScource = _pyEngine.CreateScriptSourceFromFile(SolutionPath + @"\BackEnd\Utility.py");
+            _utilityScource.Execute(_utilityScope);
 
-            replaceScource = pyEngine.CreateScriptSourceFromFile(solutionPath + @"\BackEnd\FileReplace.py");
-            replaceScource.Execute(replaceScope);
+            _fileScource = _pyEngine.CreateScriptSourceFromFile(SolutionPath + @"\BackEnd\File.py");
+            _fileScource.Execute(_fileScope);
+
+            _unrealScource = _pyEngine.CreateScriptSourceFromFile(SolutionPath + @"\BackEnd\Unreal.py");
+            _unrealScource.Execute(_unrealScope);           
         }
 
         public object StringToBytes(string str)
@@ -57,7 +68,7 @@ namespace Services
             try
             {
                 object result;
-                var strToBytes = utilityScope.GetVariable("string_to_bytes");
+                var strToBytes = _utilityScope.GetVariable("string_to_bytes");
                 result = strToBytes(str);
                 return result;
             }
@@ -67,17 +78,43 @@ namespace Services
             }
         }
 
-        public void FileReplace(string path, string oldStr, string newStr)
+        async public Task FileReplaceAsync(string path, string oldStr, string newStr,
+            bool changeFolderName = true, bool searchChildFolder = true, bool changeFileContent = true, bool changeFileName = true, bool searchChildFiles = true)
         {
-            try
+            await Task.Run(() =>
             {
-                var fileReplace = replaceScope.GetVariable("process_files_and_folders");
-                fileReplace(path, StringToBytes(oldStr), StringToBytes(newStr));
-            }
-            catch (System.Exception ex)
-            {
+                lock (_lock)
+                {
+                    try
+                    {
+                        var fileReplace = _fileScope.GetVariable("process_files_and_folders");
+                        fileReplace(path, StringToBytes(oldStr), StringToBytes(newStr), changeFolderName, searchChildFolder, changeFileContent, changeFileName, searchChildFiles);
+                    }
+                    catch (System.Exception ex)
+                    {
 
-            }
+                    }
+                }
+            });
+        }
+
+        async public Task RenameProjectNameAsync(string projectPath, string targetName)
+        {
+            await Task.Run(() =>
+            {
+                lock (_lock)
+                {
+                    try
+                    {
+                        var renameProjectName = _unrealScope.GetVariable("rename_project_name");
+                        renameProjectName(projectPath, targetName);
+                    }
+                    catch (System.Exception ex)
+                    {
+
+                    }
+                }
+            });
         }
     }
 }
