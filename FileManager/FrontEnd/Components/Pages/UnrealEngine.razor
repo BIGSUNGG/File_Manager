@@ -1,5 +1,8 @@
 ﻿@page "/UnrealEngine"
+
 @using Microsoft.Maui.Storage
+@using System;
+@using System.IO;
 
 @inject Services.PythonProcess Python
 
@@ -21,20 +24,21 @@
 <div class="container p-3">
     <div class="row">
         <div class="col-auto">
-            <button class="btn btn-primary" @onclick="RenameProject">
+            <button class="btn btn-primary" @onclick="RenameProject" disabled="@_disableRename">
                 Rename Project
             </button>
         </div>
         <div class="col">
-            <input class="form-control" type="text" placeholder="Target Name" @bind-value="_targetMame" />
+            <input class="form-control" type="text" placeholder="Target Name" @bind-value="_newName" />
         </div>
     </div>
 </div>
 
-
-@code {
-    private string _selectedFilePath = "";
-    private string _targetMame = "";
+@code 
+{
+    string _selectedFilePath = "";
+    string _newName = "";
+    bool _disableRename = false;
 
     private async Task SelectFile()
     {
@@ -59,12 +63,32 @@
         }
         catch (Exception ex)
         {
-            // 예외 처리 (필요에 따라 로그 또는 사용자에게 메시지 표시)
+
         }
     }
 
-    private async Task RenameProject()
+    private void RenameProject()
     {
-        await Python.RenameProjectNameAsync(_selectedFilePath, _targetMame);
+        if (_newName == "" || _disableRename == true)
+            return;
+
+        _disableRename = true;
+
+        Python.RenameProjectNameAsync(_selectedFilePath, _newName).ContinueWith(OnRenameFinish);
+    }
+
+    void OnRenameFinish(Task task)
+    {
+        InvokeAsync(() =>
+        {
+            _disableRename = false;
+
+            // 변경한 프로젝트 이름으로 프로젝트 경로 변경
+            string fileName = Path.GetFileName(_selectedFilePath);
+            string newFileName = _newName + ".uproject";
+            _selectedFilePath = _selectedFilePath.Replace(fileName, newFileName);
+
+            StateHasChanged();
+        });
     }
 }

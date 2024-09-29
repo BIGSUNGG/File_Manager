@@ -48,6 +48,7 @@ namespace Services
             paths.Add(ProjectPath + @"\Python");
             paths.Add(ProjectPath + @"\Python\DLLs");
             paths.Add(ProjectPath + @"\Python\Lib");
+            paths.Add(ProjectPath + @"\Python\Lib\clang");
             paths.Add(ProjectPath + @"\Python\Lib\site-packages");
             paths.Add(SolutionPath + @"\BackEnd");
             _pyEngine.SetSearchPaths(paths);
@@ -98,7 +99,7 @@ namespace Services
             });
         }
 
-        async public Task RenameProjectNameAsync(string projectPath, string targetName)
+        async public Task RenameProjectNameAsync(string projectPath, string newName)
         {
             await Task.Run(() =>
             {
@@ -107,7 +108,7 @@ namespace Services
                     try
                     {
                         var renameProjectName = _unrealScope.GetVariable("rename_project_name");
-                        renameProjectName(projectPath, targetName);
+                        renameProjectName(projectPath, newName);
                     }
                     catch (System.Exception ex)
                     {

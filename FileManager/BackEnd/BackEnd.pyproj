@@ -23,6 +23,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Config.py" />
+    <Compile Include="Parse_Cpp.py" />
+    <Compile Include="Parse_Code.py" />
+    <Compile Include="Parse_Cs.py" />
+    <Compile Include="Parse_Project.py" />
     <Compile Include="Unreal.py" />
     <Compile Include="Utility.py" />
     <Compile Include="File.py" />

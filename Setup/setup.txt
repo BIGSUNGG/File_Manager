@@ -1,3 +1,7 @@
-1. python-3.12.5.exe 파일을 기본 폴더\Python 폴더에 설치합니다.
-2. Visual Studio NuGet 패키지 매니저에서 Install-Package IronPython 실행
-3. Visual Studio NuGet 패키지 매니저에서 Install-Package IronPython.StdLib 실행
+python-3.12.5.exe 파일을 기본 폴더\Python 폴더에 설치합니다.
+
+clang 폴더를 기본 폴더\Python\Lib 에 복사
+
+Visual Studio NuGet 패키지 매니저에서 Install-Package IronPython 실행
+
+Visual Studio NuGet 패키지 매니저에서 Install-Package IronPython.StdLib 실행
