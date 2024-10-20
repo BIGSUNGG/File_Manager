@@ -1,0 +1,94 @@
+﻿@page "/ProjectName"
+
+@using Microsoft.Maui.Storage
+@using System;
+@using System.IO;
+
+@inject Services.PythonProcess Python
+
+<h2 align="Center">Unreal Engine</h2>
+
+<div class="container p-3">
+    <div class="row">
+        <div class="col-auto">
+            <button class="btn btn-primary" @onclick="SelectFile">
+                Select Project
+            </button>
+        </div>
+        <div class="col">
+            <input class="form-control" type="text" placeholder="Project Path" @bind-value="_selectedFilePath" />
+        </div>
+    </div>
+</div>
+
+<div class="container p-3">
+    <div class="row">
+        <div class="col-auto">
+            <button class="btn btn-primary" @onclick="RenameProject" disabled="@_disableRename">
+                Rename Project
+            </button>
+        </div>
+        <div class="col">
+            <input class="form-control" type="text" placeholder="New Name" @bind-value="_newName" />
+        </div>
+    </div>
+</div>
+
+@code 
+{
+    string _selectedFilePath = "";
+    string _newName = "";
+    bool _disableRename = false;
+
+    private async Task SelectFile()
+    {
+        try
+        {
+            var result = await FilePicker.Default.PickAsync(new PickOptions
+                {
+                    PickerTitle = ".uproject 파일을 선택하세요",
+                    FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+                {
+                    { DevicePlatform.WinUI, new[] { ".uproject" } },
+                    { DevicePlatform.MacCatalyst, new[] { ".uproject" } },
+                    { DevicePlatform.Android, new[] { "application/octet-stream" } }, // Android용 MIME 타입
+                    { DevicePlatform.iOS, new[] { "public.data" } } // iOS용 UTI
+                })
+                });
+
+            if (result != null)
+            {
+                _selectedFilePath = result.FullPath;
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    private void RenameProject()
+    {
+        if (_newName == "" || _disableRename == true)
+            return;
+
+        _disableRename = true;
+
+        Python.RenameProjectNameAsync(_selectedFilePath, _newName).ContinueWith(OnRenameFinish);
+    }
+
+    void OnRenameFinish(Task task)
+    {
+        InvokeAsync(() =>
+        {
+            _disableRename = false;
+
+            // 변경한 프로젝트 이름으로 프로젝트 경로 변경
+            string fileName = Path.GetFileName(_selectedFilePath);
+            string newFileName = _newName + ".uproject";
+            _selectedFilePath = _selectedFilePath.Replace(fileName, newFileName);
+
+            StateHasChanged();
+        });
+    }
+}

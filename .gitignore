@@ -2,6 +2,7 @@
 Python/*
 !Python/HERE.txt
 
+__pycache__
 .vs
 bin
 obj

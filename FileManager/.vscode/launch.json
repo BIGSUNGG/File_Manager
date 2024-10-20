@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Important/Project/Python",
-      "program": "c:/Important/Project/Python/build/Debug/outDebug",
+      "cwd": "c:/Important/Project/Python/FileManager/FileManager/BackEnd/Test/TestCase",
+      "program": "c:/Important/Project/Python/FileManager/FileManager/BackEnd/Test/TestCase/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

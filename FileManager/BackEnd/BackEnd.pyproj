@@ -23,13 +23,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Config.py" />
-    <Compile Include="Parse_Cpp.py" />
-    <Compile Include="Parse_Code.py" />
-    <Compile Include="Parse_Cs.py" />
-    <Compile Include="Parse_Project.py" />
+    <Compile Include="File.py" />
+    <Compile Include="Pattern.py" />
+    <Compile Include="Test\Test.py" />
     <Compile Include="Unreal.py" />
     <Compile Include="Utility.py" />
-    <Compile Include="File.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Test\" />
+    <Folder Include="Test\TestCase\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Test\TestCase\LyraEditor.Build.cs" />
+    <Content Include="Test\TestCase\LyraEditor.cpp" />
+    <Content Include="Test\TestCase\LyraGameModule.cpp" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

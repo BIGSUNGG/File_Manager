@@ -1,6 +1,6 @@
 #import configparser : 섹션 이름이 -로 시작하면 읽지 못하는 문제가 있어 사용하지 않음
 
-def update_config_value(file_path, section_to_find, key_to_find, new_value):
+def parse_config(file_path, section_to_find, key_to_find, new_value):
     # 파일을 읽기 모드로 엽니다
     with open(file_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
@@ -67,3 +67,4 @@ def update_config_value(file_path, section_to_find, key_to_find, new_value):
     # 파일에 변경된 내용을 다시 씁니다
     with open(file_path, 'w', encoding='utf-8') as file:
         file.writelines(lines)
+
