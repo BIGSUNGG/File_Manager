@@ -92,7 +92,7 @@ namespace Services
             });
         }
 
-        async public Task RenameModuleNameAsync(string projectPath, string targetName, string newName)
+        async public Task RenameModuleNameAsync(string projectPath, string oldName, string newName)
         {
             await Task.Run(() =>
             {
@@ -101,7 +101,7 @@ namespace Services
                     try
                     {
                         var renameProjectName = _unrealScope.GetVariable("rename_module_name");
-                        renameProjectName(projectPath, targetName, newName);
+                        renameProjectName(projectPath, oldName, newName);
                     }
                     catch (System.Exception ex)
                     {

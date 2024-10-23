@@ -2,6 +2,9 @@
 Python/*
 !Python/HERE.txt
 
+TestCase/
+TestCase Bak/
+
 __pycache__
 .vs
 bin
